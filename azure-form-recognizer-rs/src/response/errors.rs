@@ -24,6 +24,7 @@ pub enum ErrorCode {
     ServiceUnavailable,
     NotFound,
     Conflict,
+    MethodNotAllowed,
 }
 
 pub enum InnerErrorCode {
@@ -60,4 +61,7 @@ pub enum InnerErrorCode {
     ModelExists,
     GeneralInvalidParameter,
     ModelNotFound,
+    Unknown,
+    DocumentModelLimitNeural,
+    UnsupportedContent,
 }
