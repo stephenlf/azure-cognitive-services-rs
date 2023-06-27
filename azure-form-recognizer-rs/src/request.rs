@@ -1,6 +1,7 @@
 use reqwest::{Client, ClientBuilder, Method, header};
 use std::error::Error;
 use std::collections::HashMap;
+use std::io::Read;
 use url::Url;
 use core::future::Future;
 
@@ -27,8 +28,7 @@ impl RequestClient {
         Ok(client)
     }
 
-    pub fn analyze_url<T: ToString>(&self, document_url: T, model_id: &str, optional_params: OptionalParams)
-        -> Box<dyn Future<Output = Result<reqwest::Response, reqwest::Error>>> {
+    fn build_analyze_uri(&self, model_id: &str, optional_params: OptionalParams) -> String {
         let mut request_url = self.endpoint.clone();
         request_url.push_str("/formrecognizer/documentModels/");
         request_url.push_str(model_id);
@@ -45,6 +45,12 @@ impl RequestClient {
             request_url.push_str("&stringIndexType=");
             request_url.push_str(s.as_str());
         }
+        request_url
+    }
+
+    pub async fn analyze_url<T: ToString>(&self, document_url: T, model_id: &str, optional_params: OptionalParams)
+        -> impl Future <Output = Result<reqwest::Response, reqwest::Error>> {
+        let request_url = Self::build_analyze_uri(&self, model_id, optional_params);
 
         let body = format!("{{ \"urlSource\": {:?} }}", document_url.to_string());
 
@@ -53,8 +59,33 @@ impl RequestClient {
             .body(body)
             .send();
 
-        Box::new(request)
-            
+        request
+    }
+
+    pub async fn analyze_file(&self, file_bytes: Vec<u8>, file_type: FileType, model_id: &str, optional_params: OptionalParams) 
+        -> impl Future <Output = Result<reqwest::Response, reqwest::Error>> {
+        
+        let request_url = Self::build_analyze_uri(&self, model_id, optional_params);
+
+        let header_value = match file_type {
+            FileType::OctetStream => "application/octet-stream",
+            FileType::PDF => "application/pdf",
+            FileType::JPEG => "image/jpeg",
+            FileType::PNG => "image/png",
+            FileType::TIFF => "image/tiff",
+            FileType::BMP => "image/bmp",
+            FileType::HTML => "text/html",
+            FileType::DOCX => "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            FileType::XLSX => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            FileType::PPT => "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+        };
+        
+        let request = self.client.request(Method::POST, request_url)
+            .header(header::CONTENT_TYPE, header::HeaderValue::from_static(header_value))
+            .body(file_bytes)
+            .send();
+
+        request
     }
 }
 
@@ -69,3 +100,18 @@ impl Default for OptionalParams {
         OptionalParams { pages: None, locale: None, string_index_type: None }
     }
 }
+
+pub enum FileType {
+    OctetStream,
+    PDF,
+    JPEG,
+    PNG,
+    TIFF,
+    BMP,
+    HTML,
+    DOCX,
+    XLSX,
+    PPT,
+}
+
+//<Box<dyn Future<Output = Result<reqwest::Response, reqwest::Error>>>

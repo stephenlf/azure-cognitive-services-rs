@@ -1,0 +1,49 @@
+{
+  "description": "Authorization to copy a model to the specified target resource and modelId.",
+  "required": [
+    "targetResourceId",
+    "targetResourceRegion",
+    "targetModelId",
+    "targetModelLocation",
+    "accessToken",
+    "expirationDateTime"
+  ],
+  "type": "object",
+  "properties": {
+    "targetResourceId": {
+      "description": "ID of the target Azure resource where the model should be copied to.",
+      "type": "string",
+      "x-ms-azure-resource": true
+    },
+    "targetResourceRegion": {
+      "description": "Location of the target Azure resource where the model should be copied to.",
+      "type": "string"
+    },
+    "targetModelId": {
+      "description": "Unique model name.",
+      "type": "string",
+      "pattern": "[a-zA-Z0-9][a-zA-Z0-9._~-]{1,63}"
+    },
+    "targetModelLocation": {
+      "description": "URL of the copied model in the target account.",
+      "type": "string"
+    },
+    "accessToken": {
+      "description": "Token used to authorize the request.",
+      "type": "string"
+    },
+    "expirationDateTime": {
+      "description": "Date/time when the access token expires.",
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "example": {
+    "targetResourceId": "string",
+    "targetResourceRegion": "string",
+    "targetModelId": "string",
+    "targetModelLocation": "string",
+    "accessToken": "string",
+    "expirationDateTime": "string"
+  }
+}
