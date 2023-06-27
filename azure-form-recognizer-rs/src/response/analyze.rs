@@ -1,5 +1,6 @@
 #![allow(unused)]
 use serde::Deserialize;
+use serde_json;
 
 // AnalyzeDocumentResponse has no body.
 
@@ -83,37 +84,57 @@ pub struct Entity {
 #[derive(Deserialize)]
 #[serde(rename_all(deserialize = "camelCase"))]
 pub struct Document {
-    //todo
+    doc_type: Option<String>,
+    bounding_regions: Option<Vec<BoundingRegion>>,
+    spans: Option<Vec<Span>>,
+    // keys under the 'fields' object cannot be known at compile time. A loosely typed approach must be taken.
+    fields: serde_json::Value,
 }
 
 #[derive(Deserialize)]
 #[serde(rename_all(deserialize = "camelCase"))]
 pub struct SelectionMark {
-    //todo
+    state: Option<SelectionState>,
+    #[serde(alias = "boundingBox")] polygon: Option<Vec<f32>>,
+    confidence: Option<f32>,
+    span: Option<Span>,
 }
 
 #[derive(Deserialize)]
 #[serde(rename_all(deserialize = "camelCase"))]
 pub struct Annotation {
-    //todo
+    kind: Option<String>,
+    #[serde(alias = "boundingBox")] polygon: Option<Vec<f32>>,
+    confidence: Option<f32>,
 }
 
 #[derive(Deserialize)]
 #[serde(rename_all(deserialize = "camelCase"))]
 pub struct Barcode {
-    //todo
+    kind: Option<String>,
+    value: Option<String>,
+    #[serde(alias = "boundingBox")] polygon: Option<Vec<f32>>,
+    span: Option<Span>,
+    confidence: Option<f32>,
 }
 
 #[derive(Deserialize)]
 #[serde(rename_all(deserialize = "camelCase"))]
 pub struct Formula {
-    //todo
+    kind: Option<String>,
+    value: Option<String>,
+    #[serde(alias = "boundingBox")] polygon: Option<Vec<f32>>,
+    span: Option<Span>,
+    confidence: Option<f32>,
 }
 
 #[derive(Deserialize)]
 #[serde(rename_all(deserialize = "camelCase"))]
 pub struct Image {
-    //todo
+    #[serde(alias = "boundingBox")] polygon: Option<Vec<f32>>,
+    span: Option<Span>,
+    confidence: Option<f32>,
+    page_number: Option<u32>,
 }
 
 #[derive(Deserialize)]
@@ -152,6 +173,7 @@ pub struct Paragraph {
 #[serde(rename_all(deserialize = "camelCase"))]
 pub struct BoundingRegion {
     page_number: Option<u32>,
+    #[serde(alias = "boundingBox")]
     polygon: Vec<f32>,
 }
 
@@ -179,7 +201,14 @@ pub struct Language {
 #[derive(Deserialize)]
 #[serde(rename_all(deserialize = "camelCase"))]
 pub struct Cell {
-    //todo
+    kind: Option<CellType>,
+    row_index: Option<u32>,
+    column_index: Option<u32>,
+    row_span: Option<u32>,
+    column_span: Option<u32>,
+    content: Option<String>,
+    bounding_regions: Option<Vec<BoundingRegion>>,
+    spans: Option<Vec<Span>>,
 }
 
 #[derive(Deserialize)]
@@ -213,4 +242,21 @@ pub enum PageKind {
     Sheet,
     Slide,
     Image,
+}
+
+#[derive(Deserialize)]
+#[serde(rename_all(deserialize = "camelCase"))]
+pub enum SelectionState {
+    Selected,
+    Unselected,
+}
+
+#[derive(Deserialize)]
+#[serde(rename_all(deserialize = "camelCase"))]
+pub enum CellType {
+    Content,
+    RowHeader,
+    ColumnHeader,
+    StubHead,
+    Description,
 }
