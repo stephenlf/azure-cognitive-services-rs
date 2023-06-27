@@ -1,0 +1,16 @@
+[package]
+name = "azure-form-recognizer-rs"
+version = "0.1.0"
+authors = ["Stephen Funk"]
+edition = "2021"
+description = "Low-level wrapper around Azure Cognitive Service's `Form Recognizer` API with feature-flag utilities"
+repository = "github.com/stephenlf/azure-form-recognizer-rs"
+license = "MIT"
+keywords = ["azure", "api", "ocr", "optical character recognition", "cognitive services", "pdf", "image", "conversion"]
+categories = ["api-bindings", "multimedia::images", "computer-vision"]
+
+
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
