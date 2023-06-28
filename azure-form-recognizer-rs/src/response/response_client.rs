@@ -68,6 +68,12 @@ impl ResponseClient {
 
 pub struct GetAnalyzeResult(pub reqwest::Response);
 
+use super::analyze::GetAnalyzeResultResponse;
+impl GetAnalyzeResult {
+    async fn read_body(&mut self) -> Result<GetAnalyzeResultResponse, reqwest::Error> {
+        self.0.json::<GetAnalyzeResultResponse>().await
+    }
+}
 
 #[derive(Debug)]
 pub enum StatusCodeError {
